@@ -8,9 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-//#include "http.h"
-
-const useconds_t DELAY = 10*1000;
+//#include "http.hpp"
 
 int main ()
 {
@@ -37,10 +35,21 @@ int main ()
     char message[100] = "";
     printf("Message: ");
     fgets(message, 100, stdin);
-    send(client_socket, message, sizeof(message), 0);
+
+    if (send(client_socket, message, sizeof(message), 0) < 0)
+    {
+        perror("Error write client socket");
+        exit(1);
+    }
 
     char answer[100] = "";
-    recv(client_socket, answer, sizeof(answer), 0);
+
+    if (recv(client_socket, answer, sizeof(answer), 0) < 0)
+    {
+        perror("Error read client socket");
+        exit(1);
+    }
+
     printf("Answer: %s", answer);
 
     shutdown(client_socket, SHUT_RDWR);

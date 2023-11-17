@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-//#include "http.h"
+//#include "http.hpp"
 
 int main ()
 {
@@ -49,12 +49,23 @@ int main ()
         }
 
         char message[100] = "";
-        recv(slave_socket, message, sizeof(message), 0);
+
+        if (recv(slave_socket, message, sizeof(message), 0) < 0)
+        {
+            perror("Error read slave socket");
+            exit(1);
+        }
+
         printf("Message: %s", message);
         char answer[100] = "";
         printf("Answer: ");
         fgets(answer, 100, stdin);
-        send(slave_socket, answer, sizeof(answer), 0);
+
+        if (send(slave_socket, answer, sizeof(answer), 0) < 0)
+        {
+            perror("Error write slave socket");
+            exit(1);
+        }
 
         shutdown(slave_socket, SHUT_RDWR);
         close(slave_socket);
