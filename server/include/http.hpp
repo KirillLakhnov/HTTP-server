@@ -6,6 +6,8 @@
 #include <string>
 #include <cassert>
 
+#define IS_THIS_REQUEST_HEADER_FIELD(name, name_field) if(request_header_fields == name){buffer >> name_field;}
+
 const size_t MAX_LEN_REQUEST_BUF = 1024;
 const size_t MAX_LEN_METHOD_NAME = 10;
 
@@ -32,9 +34,24 @@ private:
     std::string http_version_; // TODO: переделать под double, добавить проверку на верность протокола
 
     //Поля заголовка запроса
+    std::string accept_;
+    std::string accept_charset_;
+    std::string accept_language_;
+    std::string authorization_;
+    std::string from_;
     std::string host_;
-    std::string content_type_;
+    std::string if_modified_since_;
+    std::string if_match_;
+    std::string if_none_match_;
+    std::string if_range_;
+    std::string if_unmodified_since_;
+    std::string max_forwards_;
+    std::string proxy_authorization_;
+    std::string proxy_authorization_;
+    std::string referer_;
+    std::string user_agent_;
 
+    std::string content_type_;
     std::string body_;
 
     /**
