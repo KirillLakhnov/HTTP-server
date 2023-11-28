@@ -15,13 +15,13 @@ void HTTP::request::parser()
     buffer >> http_version_;
     assert(std::cin.good());
 
-    std::string request_header_fields;
+    std::string request_header_field;
     while (buffer.tellg() != -1) // Проверка на достижение конца буфера
     {
-        buffer >> request_header_fields;
-        if (request_header_fields[request_header_fields.length() - 1] == ':')
+        buffer >> request_header_field;
+        if (request_header_field[request_header_field.length() - 1] == ':')
         {
-            request_header_fields.erase(request_header_fields.length() - 1, 1);
+            request_header_field.erase(request_header_field.length() - 1, 1);
         }        
 
              IS_THIS_REQUEST_HEADER_FIELD("Accept", accept_)
@@ -43,13 +43,14 @@ void HTTP::request::parser()
         else IS_THIS_REQUEST_HEADER_FIELD("Content-Type", content_type_)
         else
         {
-            body_ = request_header_fields;
+            body_ = request_header_field;
         }
     } 
 }
 
-void HTTP::request::dump()
+void HTTP::request::dump() const
 {
+#ifdef DEBUG
     std::cout << "\e[31mmethod_: \e[0m" << method_ << std::endl;
     std::cout << "\e[31mURI_: \e[0m" << URI_ << std::endl;
     std::cout << "\e[31mhttp_version_: \e[0m" << http_version_ << std::endl;
@@ -73,6 +74,7 @@ void HTTP::request::dump()
 
     std::cout << "\e[31mcontent_type_: \e[0m" << content_type_ << std::endl;
     std::cout << "\e[31mbody_: \e[0m" << body_ << std::endl << std::endl;
+#endif
 }
 
 void HTTP::request::GET()

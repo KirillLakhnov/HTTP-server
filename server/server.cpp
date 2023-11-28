@@ -55,7 +55,7 @@ int main ()
             perror("Error read slave socket");
             exit(1);
         }
-
+        
         printf("Request:\n%s\n", request_buf);
 
         HTTP::request client_request(request_buf);
