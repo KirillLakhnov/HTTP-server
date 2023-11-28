@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 
 #include <unistd.h>
@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-//#include "http.hpp"
+#include "include/http.hpp"
 
 int main ()
 {
@@ -25,7 +25,6 @@ int main ()
     master_socket_addr.sin_family = AF_INET;
     master_socket_addr.sin_port = htons(80);
     master_socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
 
     if (bind(master_socket, (struct sockaddr*)&master_socket_addr, sizeof(master_socket_addr)) < 0)
     {
@@ -48,15 +47,15 @@ int main ()
             exit(1);
         }
 
-        char message[100] = "";
-
-        if (recv(slave_socket, message, sizeof(message), 0) < 0)
+        char request_buf[MAX_LEN_REQUEST_BUF] = "";
+        if (recv(slave_socket, request_buf, sizeof(request_buf), 0) < 0)
         {
             perror("Error read slave socket");
             exit(1);
         }
 
-        printf("Message: %s", message);
+        printf("Request:\n %s", request_buf);
+
         char answer[100] = "";
         printf("Answer: ");
         fgets(answer, 100, stdin);

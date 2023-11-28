@@ -1,7 +1,5 @@
-http_server: server/server.c
-	gcc server/server.c -o http_server
-	./http_server
+http_server: server/server.cpp
+	gcc server/server.cpp -o bin/http_server
 
 http_client: client/client.c
-	gcc client/client.c -o http_client
-	./http_client
+	gcc client/client.c -o bin/http_client
