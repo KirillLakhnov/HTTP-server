@@ -38,6 +38,8 @@ int main ()
         exit(1);
     }
 
+    
+
     while (1)
     {
         int slave_socket = accept (master_socket, 0, 0);
@@ -54,17 +56,12 @@ int main ()
             exit(1);
         }
 
-        printf("Request:\n %s", request_buf);
+        printf("Request:\n%s\n", request_buf);
 
-        char answer[100] = "";
-        printf("Answer: ");
-        fgets(answer, 100, stdin);
+        HTTP::request client_request(request_buf);
+        client_request.dump();
 
-        if (send(slave_socket, answer, sizeof(answer), 0) < 0)
-        {
-            perror("Error write slave socket");
-            exit(1);
-        }
+        printf("Good work!\n");
 
         shutdown(slave_socket, SHUT_RDWR);
         close(slave_socket);

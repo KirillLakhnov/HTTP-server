@@ -16,7 +16,7 @@ void HTTP::request::parser()
     assert(std::cin.good());
 
     std::string request_header_fields;
-    while (buffer.tellg()) // Проверка на достижение конца буфера
+    while (buffer.tellg() != -1) // Проверка на достижение конца буфера
     {
         buffer >> request_header_fields;
         if (request_header_fields[request_header_fields.length() - 1] == ':')
@@ -43,7 +43,7 @@ void HTTP::request::parser()
         else IS_THIS_REQUEST_HEADER_FIELD("Content-Type", content_type_)
         else
         {
-            buffer >> body_;
+            body_ = request_header_fields;
         }
     } 
 }
@@ -72,7 +72,7 @@ void HTTP::request::dump()
     std::cout << "\e[31muser_agent_: \e[0m" << user_agent_ << std::endl;
 
     std::cout << "\e[31mcontent_type_: \e[0m" << content_type_ << std::endl;
-    std::cout << "\e[31mbody_: \e[0m" << body_ << std::endl;
+    std::cout << "\e[31mbody_: \e[0m" << body_ << std::endl << std::endl;
 }
 
 void HTTP::request::GET()

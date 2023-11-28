@@ -54,6 +54,7 @@ private:
     std::string content_type_;
     std::string body_;
 
+public:
     /**
      * @brief Создание нового объекта request.
      * 
@@ -67,6 +68,7 @@ private:
 
     void dump ();
 
+private:
     /**
      * @brief Парсер буфера запроса.
      */

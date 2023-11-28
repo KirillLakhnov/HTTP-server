@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-//#include "http.hpp"
+const size_t MAX_LEN_REQUEST_BUF = 1024;
 
 int main ()
 {
@@ -32,17 +32,26 @@ int main ()
         exit(1);
     }
 
-    char message[100] = "";
-    printf("Message: ");
-    fgets(message, 100, stdin);
+    char request[MAX_LEN_REQUEST_BUF] = "";
+    printf("Message:\n");
+    
+    size_t index = 0;
+    do
+    {
+        fgets(request + index, MAX_LEN_REQUEST_BUF - index, stdin);
 
-    if (send(client_socket, message, sizeof(message), 0) < 0)
+        index = strlen(request); 
+        *(request + index) = ' ';
+        index++;
+    } while (!(feof(stdin) != 0) && (index < MAX_LEN_REQUEST_BUF)); // Конец ввода задается Ctrl+D;
+    
+    if (send(client_socket, request, sizeof(request), 0) < 0)
     {
         perror("Error write client socket");
         exit(1);
     }
 
-    char answer[100] = "";
+    /*char answer[100] = "";
 
     if (recv(client_socket, answer, sizeof(answer), 0) < 0)
     {
@@ -50,7 +59,7 @@ int main ()
         exit(1);
     }
 
-    printf("Answer: %s", answer);
+    printf("Answer: %s", answer);*/
 
     shutdown(client_socket, SHUT_RDWR);
     close (client_socket);
