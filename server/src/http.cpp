@@ -48,6 +48,33 @@ void HTTP::request::parser()
     } 
 }
 
+void HTTP::request::dump()
+{
+    std::cout << "\e[31mmethod_: \e[0m" << method_ << std::endl;
+    std::cout << "\e[31mURI_: \e[0m" << URI_ << std::endl;
+    std::cout << "\e[31mhttp_version_: \e[0m" << http_version_ << std::endl;
+
+    std::cout << "\e[31maccept_: \e[0m" << accept_ << std::endl;
+    std::cout << "\e[31maccept_charset_: \e[0m" << accept_charset_ << std::endl;
+    std::cout << "\e[31maccept_language_: \e[0m" << accept_language_ << std::endl;
+    std::cout << "\e[31mauthorization_: \e[0m" << authorization_ << std::endl;
+    std::cout << "\e[31mfrom_: \e[0m" << from_ << std::endl;
+    std::cout << "\e[31mhost_: \e[0m" << host_ << std::endl;
+    std::cout << "\e[31mif_modified_since_: \e[0m" << if_modified_since_ << std::endl;
+    std::cout << "\e[31mif_match_: \e[0m" << if_match_ << std::endl;
+    std::cout << "\e[31mif_none_match_: \e[0m" << if_none_match_ << std::endl;
+    std::cout << "\e[31mif_range_ \e[0m" << if_range_ << std::endl;
+    std::cout << "\e[31mif_unmodified_since_: \e[0m" << if_unmodified_since_ << std::endl;
+    std::cout << "\e[31mmax_forwards_: \e[0m" << max_forwards_ << std::endl;
+    std::cout << "\e[31mproxy_authorization_: \e[0m" << proxy_authorization_ << std::endl;
+    std::cout << "\e[31mrange_: \e[0m" << range_ << std::endl;
+    std::cout << "\e[31mreferer_: \e[0m" << referer_ << std::endl;
+    std::cout << "\e[31muser_agent_: \e[0m" << user_agent_ << std::endl;
+
+    std::cout << "\e[31mcontent_type_: \e[0m" << content_type_ << std::endl;
+    std::cout << "\e[31mbody_: \e[0m" << body_ << std::endl;
+}
+
 void HTTP::request::GET()
 {
 

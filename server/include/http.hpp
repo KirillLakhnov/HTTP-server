@@ -47,7 +47,7 @@ private:
     std::string if_unmodified_since_;
     std::string max_forwards_;
     std::string proxy_authorization_;
-    std::string proxy_authorization_;
+    std::string range_;
     std::string referer_;
     std::string user_agent_;
 
@@ -64,6 +64,8 @@ private:
     {
         parser();
     }
+
+    void dump ();
 
     /**
      * @brief Парсер буфера запроса.
