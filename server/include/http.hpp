@@ -31,9 +31,10 @@ private:
     std::string URI_;
     std::string http_version_; // TODO: переделать под double, добавить проверку на верность протокола
 
+    //Поля заголовка запроса
     std::string host_;
-
     std::string content_type_;
+
     std::string body_;
 
     /**

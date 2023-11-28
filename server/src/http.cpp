@@ -16,7 +16,7 @@ void HTTP::request::parser()
     assert(std::cin.good());
 
     std::string request_header_fields;
-    while (buffer)
+    while (buffer.tellg()) // Проверка на достижение конца буфера
     {
         buffer >> request_header_fields;
         if (request_header_fields[request_header_fields.length() - 1] == ':')
@@ -82,19 +82,4 @@ void HTTP::request::TRACE()
 void HTTP::request::PATCH()
 {
     
-}
-
-int main()
-{
-    std::string str = "Host:";
-    str.erase(str.length() - 1, 1);
-
-    std::cout << str;
-
-    if(str == "Host")
-    {
-        std::cout << 1;
-    }
-
-    return 0;
 }
