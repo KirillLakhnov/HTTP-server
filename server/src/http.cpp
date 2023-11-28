@@ -2,8 +2,6 @@
 
 void HTTP::request::parser()
 {
-    size_t index = 0;
-
     std::stringstream buffer;
     buffer << request_buf_;
     assert(std::cout.good());
@@ -16,6 +14,29 @@ void HTTP::request::parser()
 
     buffer >> http_version_;
     assert(std::cin.good());
+
+    std::string request_header_fields;
+    while (buffer)
+    {
+        buffer >> request_header_fields;
+        if (request_header_fields[request_header_fields.length() - 1] == ':')
+        {
+            request_header_fields.erase(request_header_fields.length() - 1, 1);
+        }        
+
+        if (request_header_fields == "Host")
+        {
+            buffer >> host_;
+        }
+        else if (request_header_fields == "Content-Type")
+        {
+            buffer >> content_type_;
+        }
+        else
+        {
+            buffer >> body_;
+        }
+    } 
 }
 
 void HTTP::request::GET()
@@ -61,4 +82,19 @@ void HTTP::request::TRACE()
 void HTTP::request::PATCH()
 {
     
+}
+
+int main()
+{
+    std::string str = "Host:";
+    str.erase(str.length() - 1, 1);
+
+    std::cout << str;
+
+    if(str == "Host")
+    {
+        std::cout << 1;
+    }
+
+    return 0;
 }

@@ -41,12 +41,16 @@ private:
      * 
      * @param request_buf буфер запроса.
      */
-    request(char* request_buf) : request_buf_(std::string(request_buf))
+    request(char* request_buf) : request_buf_(std::string(request_buf)), 
+                                 content_type_("application/x-www-form-urlencoded")
     {
-
+        parser();
     }
 
-    void parser ();
+    /**
+     * @brief Парсер буфера запроса.
+     */
+    void parser();
 
     /**
      * @brief GET запрашивает представление ресурса. 
