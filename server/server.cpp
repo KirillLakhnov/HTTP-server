@@ -3,14 +3,41 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+//#include <sys/epoll.h>
+#include <sys/select.h>
+#include <sys/ioctl.h>
 #include <netinet/in.h>
 
 #include "include/http.hpp"
 
-/*int main ()
+//TODO: разобраться получше.
+int set_nonblock (int socket_fd)
+{
+    /*int flag = 0;
+
+#ifdef O_NONBLOCK
+    if(-1 == (flag = fcntl(socket_fd, F_GETFL, 0))) 
+    {
+        flag = 0;
+    }
+    return fcntl(socket_fd, F_GETFL, flag | O_NONBLOCK);
+#else
+    flag = 1;
+    return ioctl(socket_fd, FIONBIO, &flag);
+#endif*/
+
+    if (fcntl(socket_fd, F_SETFL, fcntl(socket_fd, F_GETFL, 0) | O_NONBLOCK) ==-1) 
+    {
+		return -1;
+	}
+	return 0;
+}
+
+int main ()
 {
     int master_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (master_socket < 0)
@@ -32,18 +59,17 @@
         exit(1);
     }
 
-    if (listen (master_socket, SOMAXCONN) < 0)
+    //set_nonblock(master_socket);
+    if (listen(master_socket, SOMAXCONN) < 0)
     {
         perror("Error listen master socket");
         exit(1);
     }
 
-    
-
     while (1)
     {
-        int slave_socket = accept (master_socket, 0, 0);
-        if (master_socket < 0)
+        int slave_socket = accept(master_socket, 0, 0);
+        if (slave_socket < 0)
         {
             perror("Error creater slave socket");
             exit(1);
@@ -69,25 +95,6 @@
 
     shutdown(master_socket, SHUT_RDWR);
     close(master_socket);
-
-    return 0;
-}*/
-
-int main()
-{
-    std::string protocol_name_version = "HTTP/1.1";
-
-    size_t slash_find = protocol_name_version.find('/');
-    if (slash_find == std::string::npos)
-    {
-        return 1;
-    }
-
-    std::string protocol = protocol_name_version.substr(0, slash_find);
-    double version = stod(protocol_name_version.substr(slash_find + 1, protocol_name_version.size()));
-
-    std::cout << protocol << std::endl;
-    std::cout << version << std::endl;
 
     return 0;
 }

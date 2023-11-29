@@ -35,6 +35,7 @@ void HTTP::request::parser()
     {
         status_code_ = NOT_IMPLEMENTED;
         std::cout << "Error: incorrect protocol and version input format." << std::endl;
+        dump();
         return;
     }
     protocol_ = protocol_name_version.substr(0, slash_find);
@@ -42,6 +43,7 @@ void HTTP::request::parser()
     {
         status_code_ = NOT_IMPLEMENTED;
         std::cout << "Error: invalid protocol." << std::endl;
+        dump();
         return;
     }
     protocol_version_ = stod(protocol_name_version.substr(slash_find + 1, 
@@ -51,6 +53,7 @@ void HTTP::request::parser()
         status_code_ = HTTP_VERSION_NOT_SUPPORTED;
         std::cout << "Error: the HTTP protocol version" << protocol_version_ 
                   << "is not supported." << std::endl;
+        dump();
         return;
     }
 
@@ -92,7 +95,8 @@ void HTTP::request::dump() const
 #ifdef DEBUG
     std::cout << "\e[31mmethod_: \e[0m" << method_ << std::endl;
     std::cout << "\e[31mURI_: \e[0m" << URI_ << std::endl;
-    std::cout << "\e[31mhttp_version_: \e[0m" << http_version_ << std::endl << std::endl;
+    std::cout << "\e[31mprotocol_: \e[0m" << protocol_ << std::endl;
+    std::cout << "\e[31mprotocol_version_: \e[0m" << protocol_version_ << std::endl << std::endl;
 
     std::cout << "\e[31maccept_: \e[0m" << accept_ << std::endl;
     std::cout << "\e[31maccept_charset_: \e[0m" << accept_charset_ << std::endl;
@@ -120,8 +124,10 @@ void HTTP::request::dump() const
 
 void HTTP::request::answer()
 {
-    answer_buf_ += http_version_;
-    //answer_buf_ += (' ' + status_code_ + ) TODO: добавить вывод имени статуса состояния
+    answer_buf_ += (protocol_ + '/');
+    answer_buf_ += (protocol_version_ + ' ');
+
+    answer_buf_ += (status_code_ + '\n'); //TODO: добавить вывод имени статуса состояния
 }
 
 void HTTP::request::GET()

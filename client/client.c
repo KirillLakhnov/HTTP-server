@@ -51,16 +51,6 @@ int main ()
         exit(1);
     }
 
-    /*char answer[100] = "";
-
-    if (recv(client_socket, answer, sizeof(answer), 0) < 0)
-    {
-        perror("Error read client socket");
-        exit(1);
-    }
-
-    printf("Answer: %s", answer);*/
-
     shutdown(client_socket, SHUT_RDWR);
     close (client_socket);
 
