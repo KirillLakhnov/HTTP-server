@@ -1,19 +1,58 @@
 #include "../include/http.hpp"
+HTTP::request::request(char* request_buf) : request_buf_(std::string(request_buf)), 
+                                            content_type_("application/x-www-form-urlencoded"),
+                                            status_code_(CONTINUE)
+{
+    parser();
+}
 
 void HTTP::request::parser()
 {
+    status_code_ = ACCEPTED;
+
     std::stringstream buffer;
     buffer << request_buf_;
     assert(std::cout.good());
 
     buffer >> method_;
     assert(std::cin.good());
+    if (is_method(method_) == false)
+    {
+        status_code_ = NOT_IMPLEMENTED;
+        std::cout << "Error: invalid HTTP request method." << std::endl;
+        return;
+    }
 
-    buffer >> URI_;
+    buffer >> URI_; 
     assert(std::cin.good());
 
-    buffer >> http_version_;
+    std::string protocol_name_version;
+    buffer >> protocol_name_version;
     assert(std::cin.good());
+
+    size_t slash_find = protocol_name_version.find('/');
+    if (slash_find == std::string::npos)
+    {
+        status_code_ = NOT_IMPLEMENTED;
+        std::cout << "Error: incorrect protocol and version input format." << std::endl;
+        return;
+    }
+    protocol_ = protocol_name_version.substr(0, slash_find);
+    if (is_HTTP(protocol_) == false)
+    {
+        status_code_ = NOT_IMPLEMENTED;
+        std::cout << "Error: invalid protocol." << std::endl;
+        return;
+    }
+    protocol_version_ = stod(protocol_name_version.substr(slash_find + 1, 
+                             protocol_name_version.size()));
+    if (protocol_version_ <= HTTP_VERSION_)
+    {
+        status_code_ = HTTP_VERSION_NOT_SUPPORTED;
+        std::cout << "Error: the HTTP protocol version" << protocol_version_ 
+                  << "is not supported." << std::endl;
+        return;
+    }
 
     std::string request_header_field;
     while (buffer.tellg() != -1) // Проверка на достижение конца буфера
@@ -53,7 +92,7 @@ void HTTP::request::dump() const
 #ifdef DEBUG
     std::cout << "\e[31mmethod_: \e[0m" << method_ << std::endl;
     std::cout << "\e[31mURI_: \e[0m" << URI_ << std::endl;
-    std::cout << "\e[31mhttp_version_: \e[0m" << http_version_ << std::endl;
+    std::cout << "\e[31mhttp_version_: \e[0m" << http_version_ << std::endl << std::endl;
 
     std::cout << "\e[31maccept_: \e[0m" << accept_ << std::endl;
     std::cout << "\e[31maccept_charset_: \e[0m" << accept_charset_ << std::endl;
@@ -70,11 +109,19 @@ void HTTP::request::dump() const
     std::cout << "\e[31mproxy_authorization_: \e[0m" << proxy_authorization_ << std::endl;
     std::cout << "\e[31mrange_: \e[0m" << range_ << std::endl;
     std::cout << "\e[31mreferer_: \e[0m" << referer_ << std::endl;
-    std::cout << "\e[31muser_agent_: \e[0m" << user_agent_ << std::endl;
+    std::cout << "\e[31muser_agent_: \e[0m" << user_agent_ << std::endl << std::endl;
 
     std::cout << "\e[31mcontent_type_: \e[0m" << content_type_ << std::endl;
     std::cout << "\e[31mbody_: \e[0m" << body_ << std::endl << std::endl;
+
+    std::cout << "\e[31mstatus_code_: \e[0m" << status_code_ << std::endl << std::endl;
 #endif
+}
+
+void HTTP::request::answer()
+{
+    answer_buf_ += http_version_;
+    //answer_buf_ += (' ' + status_code_ + ) TODO: добавить вывод имени статуса состояния
 }
 
 void HTTP::request::GET()

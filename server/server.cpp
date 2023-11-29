@@ -10,7 +10,7 @@
 
 #include "include/http.hpp"
 
-int main ()
+/*int main ()
 {
     int master_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (master_socket < 0)
@@ -55,7 +55,7 @@ int main ()
             perror("Error read slave socket");
             exit(1);
         }
-        
+
         printf("Request:\n%s\n", request_buf);
 
         HTTP::request client_request(request_buf);
@@ -69,6 +69,25 @@ int main ()
 
     shutdown(master_socket, SHUT_RDWR);
     close(master_socket);
+
+    return 0;
+}*/
+
+int main()
+{
+    std::string protocol_name_version = "HTTP/1.1";
+
+    size_t slash_find = protocol_name_version.find('/');
+    if (slash_find == std::string::npos)
+    {
+        return 1;
+    }
+
+    std::string protocol = protocol_name_version.substr(0, slash_find);
+    double version = stod(protocol_name_version.substr(slash_find + 1, protocol_name_version.size()));
+
+    std::cout << protocol << std::endl;
+    std::cout << version << std::endl;
 
     return 0;
 }
