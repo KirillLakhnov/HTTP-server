@@ -48,11 +48,11 @@ void HTTP::request::parser()
     }
     protocol_version_ = stod(protocol_name_version.substr(slash_find + 1, 
                              protocol_name_version.size()));
-    if (protocol_version_ <= HTTP_VERSION_)
+    if (protocol_version_ <= HTTP_VERSION_) //?????БАГ
     {
         status_code_ = HTTP_VERSION_NOT_SUPPORTED;
         std::cout << "Error: the HTTP protocol version" << protocol_version_ 
-                  << "is not supported." << std::endl;
+                  << " is not supported." << std::endl;
         dump();
         return;
     }
