@@ -48,7 +48,7 @@ void HTTP::request::parser()
     }
     protocol_version_ = stod(protocol_name_version.substr(slash_find + 1, 
                              protocol_name_version.size()));
-    if (protocol_version_ <= HTTP_VERSION_) //?????БАГ
+    if (protocol_version_ < HTTP_VERSION_)
     {
         status_code_ = HTTP_VERSION_NOT_SUPPORTED;
         std::cout << "Error: the HTTP protocol version" << protocol_version_ 
@@ -128,6 +128,8 @@ void HTTP::request::answer()
     answer_buf_ += (protocol_version_ + ' ');
 
     answer_buf_ += (status_code_ + '\n'); //TODO: добавить вывод имени статуса состояния
+
+    std::cout << std::endl << std::endl << answer_buf_ << std::endl;
 }
 
 void HTTP::request::GET()

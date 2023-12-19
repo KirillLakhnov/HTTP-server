@@ -3,34 +3,29 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <vector>
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-//#include <sys/epoll.h>
-#include <sys/select.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 
+/* #ifdef __APPLE__
+    #include <sys/poll.h>
+#else
+    #include <sys/epoll.h>
+#endif */
+#include <sys/poll.h>
+
 #include "include/http.hpp"
 
-//TODO: разобраться получше.
+const size_t POLL_SIZE = 1024;
+
 int set_nonblock (int socket_fd)
 {
-    /*int flag = 0;
-
-#ifdef O_NONBLOCK
-    if(-1 == (flag = fcntl(socket_fd, F_GETFL, 0))) 
-    {
-        flag = 0;
-    }
-    return fcntl(socket_fd, F_GETFL, flag | O_NONBLOCK);
-#else
-    flag = 1;
-    return ioctl(socket_fd, FIONBIO, &flag);
-#endif*/
-
-    if (fcntl(socket_fd, F_SETFL, fcntl(socket_fd, F_GETFL, 0) | O_NONBLOCK) ==-1) 
+    if (fcntl(socket_fd, F_SETFL, fcntl(socket_fd, F_GETFL, 0) | O_NONBLOCK) == -1) 
     {
 		return -1;
 	}
@@ -39,7 +34,7 @@ int set_nonblock (int socket_fd)
 
 int main ()
 {
-    int master_socket = socket(AF_INET, SOCK_STREAM, 0);
+    int master_socket = socket(AF_INET, SOCK_STREAM, 0); //TCP-сокет для приема запросов на соединение.
     if (master_socket < 0)
     {
         perror("Error creater master socket");
@@ -59,38 +54,86 @@ int main ()
         exit(1);
     }
 
-    //set_nonblock(master_socket);
+    if (set_nonblock(master_socket) == -1)
+    {
+        perror("Error creating a non-blocking socket");
+    }
+
     if (listen(master_socket, SOMAXCONN) < 0)
     {
         perror("Error listen master socket");
         exit(1);
     }
 
+    struct pollfd active_set[POLL_SIZE] = {};
+    active_set[0].fd = master_socket;
+    active_set[0].events = POLLIN;
+    active_set[0].revents = 0;
+    int size_active_set = 1;
+
+    //Цикл проверки состояния сокетов
     while (1)
     {
-        int slave_socket = accept(master_socket, 0, 0);
-        if (slave_socket < 0)
+        int poll_ret = poll(active_set, size_active_set, -1);
+
+        if (poll_ret < 0)
         {
-            perror("Error creater slave socket");
+            perror("Error poll");
             exit(1);
         }
 
-        char request_buf[MAX_LEN_REQUEST_BUF] = "";
-        if (recv(slave_socket, request_buf, sizeof(request_buf), 0) < 0)
+        //TODO: оптимизация работы с памятью 
+        for (int i = 0; i < size_active_set; i++)
         {
-            perror("Error read slave socket");
-            exit(1);
+            if (active_set[i].revents & POLLIN)
+            {
+                active_set[i].revents &= ~POLLIN;
+
+                if (i == 0)
+                {
+                    int slave_socket = accept(master_socket, 0, 0);
+                    if (slave_socket < 0)
+                    {
+                        perror("Error creater slave socket");
+                        exit(1);
+                    }
+
+                    if (size_active_set < POLL_SIZE)
+                    {
+                        active_set[size_active_set].fd = slave_socket;
+                        active_set[size_active_set].events = POLLIN;
+                        active_set[size_active_set].revents = 0;
+                        size_active_set++;
+                    }
+                    else
+                    {
+                        printf ("size_active_set == POLL_SIZE: no connect.\n");
+
+                        shutdown(slave_socket, SHUT_RDWR);
+                        close(slave_socket);
+                    }
+                }
+                else
+                {
+                    char request_buf[MAX_LEN_REQUEST_BUF] = "";
+                    if (recv(active_set[i].fd, request_buf, sizeof(request_buf), 0) < 0)
+                    {
+                        perror("Error read slave socket");
+                        exit(1);
+                    }
+
+                    printf("Request:\n%s\n", request_buf);
+
+                    HTTP::request client_request(request_buf);
+                    client_request.dump();
+                    client_request.answer();
+
+                    printf("Good work!\n");
+
+                    active_set[i].events = POLLOUT;
+                }
+            }
         }
-
-        printf("Request:\n%s\n", request_buf);
-
-        HTTP::request client_request(request_buf);
-        client_request.dump();
-
-        printf("Good work!\n");
-
-        shutdown(slave_socket, SHUT_RDWR);
-        close(slave_socket);
     }
 
     shutdown(master_socket, SHUT_RDWR);

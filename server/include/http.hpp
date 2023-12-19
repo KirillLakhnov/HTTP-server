@@ -109,16 +109,16 @@ public:
      */
     void dump () const;
 
+    /**
+     * @brief ответ сервера на запрос. 
+     */
+    void answer();
+
 private:
     /**
      * @brief Парсер буфера запроса.
      */
     void parser();
-
-    /**
-     * @brief ответ сервера на запрос. 
-     */
-    void answer();
 
     /**
      * @brief GET запрашивает представление ресурса. 
