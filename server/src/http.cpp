@@ -125,7 +125,7 @@ void HTTP::request::dump() const
 void HTTP::request::answer()
 {
     answer_buf_ += (protocol_ + '/');
-    answer_buf_ += (protocol_version_ + ' ');
+    answer_buf_ += (protocol_version_ + ' '); //преобразование double и size_t в string
 
     answer_buf_ += (status_code_ + '\n'); //TODO: добавить вывод имени статуса состояния
 
